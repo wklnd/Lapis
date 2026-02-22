@@ -289,11 +289,7 @@ html, body {
   background: var(--bg-editor);
 }
 
-.cm-editor {
-  height: 100%;
-  font-size: 16px;
-  background: var(--bg-editor);
-}
+.cm-editor { height: 100%; font-size: var(--editor-font-size, 16px); }
 .cm-editor.cm-focused { outline: none; }
 .cm-scroller      { padding: 40px; }
 
@@ -667,4 +663,75 @@ html, body {
   padding: 1px 5px;
   font-size: 0.9em;
   color: var(--text-primary);
+}
+
+/* ── RESIZE HANDLE ────────────────────────────────────────────── */
+#resize-handle {
+  width: 4px;
+  background: transparent;
+  cursor: col-resize;
+  flex-shrink: 0;
+  transition: background 0.2s;
+  position: relative;
+  z-index: 10;
+}
+#resize-handle:hover,
+#resize-handle.dragging { background: var(--accent); }
+
+/* ── STATUS BAR ───────────────────────────────────────────────── */
+#status-bar {
+  height: 24px;
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  font-size: 0.75em;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  user-select: none;
+}
+#status-bar span { display: flex; align-items: center; gap: 12px; }
+
+/* ── FONT SIZE SLIDER ─────────────────────────────────────────── */
+.settings-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.settings-row:last-child { border-bottom: none; }
+.settings-row label { font-size: 0.9em; color: var(--text-primary); }
+.settings-row .settings-row-desc { font-size: 0.8em; color: var(--text-muted); margin-top: 2px; }
+.settings-row-left { display: flex; flex-direction: column; }
+
+.font-slider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.font-slider input[type="range"] {
+  -webkit-appearance: none;
+  width: 120px;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+.font-slider input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  cursor: pointer;
+}
+.font-slider-value {
+  font-size: 0.85em;
+  color: var(--text-muted);
+  width: 32px;
+  text-align: right;
 }

@@ -6,6 +6,7 @@ import { HighlightStyle, syntaxHighlighting } from '@codemirror/language';
 import { tags } from '@lezer/highlight';
 import { writeTextFile } from '@tauri-apps/plugin-fs';
 import { markDirty, markClean } from './tabs.js';
+import { countAndUpdate } from './statusbar.js';
 
 // ─── HR Widget ────────────────────────────────────────────────────────────────
 class HRWidget extends WidgetType {
@@ -110,14 +111,16 @@ function buildExtensions(filePath) {
     markdownDecorations,
     EditorView.lineWrapping,
     EditorView.updateListener.of(update => {
-      if (update.docChanged) {
+    if (update.docChanged) {
         markDirty(filePath);
+        const text = update.state.doc.toString();
+        countAndUpdate(filePath, text);
         clearTimeout(saveTimeout);
         saveTimeout = setTimeout(async () => {
-          await writeTextFile(filePath, update.state.doc.toString());
-          markClean(filePath);
+        await writeTextFile(filePath, text);
+        markClean(filePath);
         }, 300);
-      }
+    }
     }),
   ];
 }
@@ -206,7 +209,7 @@ export async function openFile(filePath, itemEl, { readTextFile, recentFiles, cu
     extensions: buildExtensions(filePath),
     parent: root,
   });
-
+  countAndUpdate(filePath, content);
   recentFiles.unshift(filePath);
   const deduped = [...new Set(recentFiles)].slice(0, 8);
   recentFiles.length = 0;

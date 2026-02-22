@@ -20,7 +20,8 @@ export async function loadAndApplyTheme(vaultPath, config) {
   _vaultPath = vaultPath;
   const themeId = config.theme || 'dark';
   currentThemeId = themeId;
-
+  const fontSize = localStorage.getItem('lapis-font-size') || '16';
+  document.documentElement.style.setProperty('--editor-font-size', fontSize + 'px');
   if (BUILT_IN_THEMES[themeId]) {
     applyTheme(BUILT_IN_THEMES[themeId].colors);
   } else {
@@ -48,6 +49,37 @@ async function renderSettingsPage() {
   const customThemes = _vaultPath ? await loadCustomThemes(_vaultPath) : [];
 
   container.innerHTML = '';
+
+    // ── Font size ──
+    const fontSection = document.createElement('div');
+    fontSection.innerHTML = '<h3 class="settings-section-title">Editor</h3>';
+
+    const savedSize = parseInt(localStorage.getItem('lapis-font-size') || '16');
+
+    const row = document.createElement('div');
+    row.className = 'settings-row';
+    row.innerHTML = `
+    <div class="settings-row-left">
+    <label>Font Size</label>
+    <span class="settings-row-desc">Editor text size in pixels</span>
+    </div>
+    <div class="font-slider">
+    <input type="range" id="font-size-slider" min="12" max="28" step="1" value="${savedSize}" />
+    <span class="font-slider-value" id="font-size-value">${savedSize}px</span>
+    </div>
+    `;
+    fontSection.appendChild(row);
+    container.appendChild(fontSection);
+
+    // Wire up slider
+    const slider = row.querySelector('#font-size-slider');
+    const label  = row.querySelector('#font-size-value');
+    slider.addEventListener('input', () => {
+    const val = slider.value;
+    label.textContent = val + 'px';
+    document.querySelector('.cm-editor').style.fontSize = val + 'px';
+    localStorage.setItem('lapis-font-size', val);
+    });
 
   // ── Built-in themes ──
   const builtInSection = document.createElement('div');

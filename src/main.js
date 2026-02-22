@@ -9,7 +9,10 @@ import { initTabs, openTab, clearTabs, restoreTabs } from './tabs.js';
 import { initPalette, registerCommands } from './palette.js';
 import { openSettings } from './settings.js';
 import { openPalette } from './palette.js';
+import { initCommands } from './commands.js';
 import { initShortcuts } from './shortcuts.js';
+import { initResize } from './resize.js';
+import { initStatusBar } from './statusbar.js'
 
 // ─── Shared callbacks ─────────────────────────────────────────────────────────
 const callbacks = {
@@ -111,14 +114,10 @@ initTabs({
   getVaultPath: () => state.currentVaultPath,
 });
 initPalette({ openFile: handleOpenFile });
-registerCommands([
-  { label: 'New File',       icon: '', shortcut: 'Ctrl+N', action: newFile },
-  { label: 'Open Vault',     icon: '', shortcut: '',        action: () => handleOpenVaultDialog({ buildFileTree: callbacks.buildFileTree, renderRecentVaultsList }) },
-  { label: 'Create Vault',   icon: '', shortcut: '',        action: () => handleCreateVault({ buildFileTree: callbacks.buildFileTree, renderRecentVaultsList }) },
-  { label: 'Switch Vault',   icon: '', shortcut: '',        action: () => { clearTabs(); showWelcome({ renderRecentVaultsList }); } },
-  { label: 'Open Settings',  icon: '', shortcut: '',        action: openSettings },
-]);
+initCommands({ newFile, callbacks });
 initShortcuts({ newFile, openFile: handleOpenFile });
+initResize();
+initStatusBar();
 
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 async function boot() {
