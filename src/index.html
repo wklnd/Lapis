@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Lapis</title>
+  <style>
+    @import url('./assets/style.css');
+  </style>
+</head>
+<body>
+
+<!-- WELCOME SCREEN -->
+<div id="welcome">
+  <div class="logo">Lapis</div>
+  <div class="tagline">lightweight markdown editor</div>
+  <div class="welcome-cards">
+    <div class="welcome-card" id="btn-open">
+      <div class="card-icon"></div>
+      <div class="card-title">Open Vault</div>
+      <div class="card-desc">Open an existing folder as your workspace</div>
+    </div>
+    <div class="welcome-card" id="btn-create">
+      <div class="card-icon"></div>
+      <div class="card-title">Create Vault</div>
+      <div class="card-desc">Start fresh with a new vault</div>
+    </div>
+  </div>
+  <div class="recent-section" id="recent-vaults"></div>
+</div>
+
+<!-- EDITOR APP -->
+<div id="app">
+  <div id="sidebar">
+    <div id="vault-header">
+      <span id="vault-name">Vault</span>
+      <button id="btn-new-file" title="New file">+</button>
+    </div>
+    <input id="search-box" placeholder="Search files..." />
+    <div id="file-tree"></div>
+    <div id="sidebar-footer">
+      <button id="btn-settings" title="Settings">Settings</button>
+      <div id="vault-switcher">
+        <span>Switch Vault</span>
+        <span>^</span>
+      </div>
+    </div>
+  </div>
+<div id="editor-wrap">
+  <div id="tab-bar"></div>
+  <div id="no-file">Open a file from the sidebar</div>
+  <div id="editor-root" style="display:none;"></div>
+</div>
+</div>
+
+<!-- MODAL -->
+<div id="modal-overlay">
+  <div id="modal-box">
+    <h2 id="modal-title"></h2>
+    <p id="modal-desc" style="display:none"></p>
+    <input id="modal-input" style="display:none" />
+    <div id="modal-actions">
+      <button id="modal-cancel">Cancel</button>
+      <button id="modal-confirm">Confirm</button>
+    </div>
+  </div>
+</div>
+
+<!-- CONTEXT MENU -->
+<div id="context-menu">
+  <div class="ctx-item" id="ctx-new-file">New File</div>
+  <div class="ctx-item" id="ctx-new-folder">New Folder</div>
+  <div class="ctx-divider"></div>
+  <div class="ctx-item" id="ctx-rename">Rename</div>
+  <div class="ctx-item" id="ctx-copy-path">Copy Path</div>
+  <div class="ctx-divider"></div>
+  <div class="ctx-item danger" id="ctx-delete">Delete</div>
+</div>
+
+<!-- SETTINGS -->
+<div id="settings-overlay">
+  <div id="settings-panel">
+    <div id="settings-header">
+      <h1>Settings</h1>
+      <button id="settings-close">✕</button>
+    </div>
+    <div id="settings-nav">
+      <div class="settings-nav-item active" data-tab="themes">Themes</div>
+    </div>
+    <div id="settings-content">
+      <div id="settings-themes"></div>
+    </div>
+  </div>
+</div>
+
+<!-- COMMAND PALETTE -->
+<div id="palette-overlay">
+  <div id="palette-box">
+    <input id="palette-input" placeholder="Search files..." autocomplete="off" spellcheck="false" />
+    <div id="palette-results"></div>
+    <div id="palette-hint">
+      <span><kbd>↑↓</kbd> navigate</span>
+      <span><kbd>Enter</kbd> open</span>
+      <span><kbd>Esc</kbd> close</span>
+      <span><kbd>&gt;</kbd> commands</span>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="./main.js"></script>
+</body>
+</html>

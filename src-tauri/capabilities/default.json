@@ -1,0 +1,27 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "default",
+  "description": "Default capabilities",
+  "windows": ["main"],
+  "permissions": [
+    "core:default",
+    "fs:allow-read-dir",
+    "fs:allow-read-file",
+    "fs:allow-write-file",
+    "fs:allow-write-text-file",
+    "fs:allow-create",
+    "fs:allow-mkdir",
+    "fs:allow-exists",
+    "fs:allow-rename",
+    "fs:allow-remove",
+    "fs:write-all",
+    "fs:allow-applocaldata-write",
+    "fs:allow-applocaldata-read",
+    "fs:allow-home-write",
+    "fs:allow-home-read",
+    "fs:allow-home-read-recursive",
+    "fs:allow-home-write-recursive",
+    "dialog:allow-open",
+    "dialog:allow-save"
+  ]
+}
