@@ -42,7 +42,7 @@ export async function saveVaultConfig(vaultPath, cfg) {
   } catch(e) { console.error(e); }
 }
 
-export async function openVault(vaultPath, { buildFileTree, renderRecentSidebar, renderRecentVaultsList }) {
+export async function openVault(vaultPath, { buildFileTree, renderRecentVaultsList }) {
   state.currentVaultPath = vaultPath.replace(/\\/g, '/');
   state.recentVaults = [vaultPath, ...state.recentVaults.filter(v => v !== vaultPath)].slice(0, 5);
   await saveGlobalConfig({ recentVaults: state.recentVaults });
@@ -55,7 +55,6 @@ export async function openVault(vaultPath, { buildFileTree, renderRecentSidebar,
   document.getElementById('vault-name').textContent = vaultPath.replace(/\\/g, '/').split('/').pop();
 
   await buildFileTree(vaultPath);
-
 }
 
 export function showWelcome({ renderRecentVaultsList }) {
@@ -67,7 +66,8 @@ export function showWelcome({ renderRecentVaultsList }) {
   renderRecentVaultsList(state.recentVaults);
 }
 
-export function renderRecentVaultsList(recentVaults) {
+// openVaultCb is passed in from main.js to avoid circular imports
+export function renderRecentVaultsList(recentVaults, openVaultCb) {
   const container = document.getElementById('recent-vaults');
   if (!recentVaults.length) { container.innerHTML = ''; return; }
   container.innerHTML = '<h3>Recent Vaults</h3>';
@@ -84,17 +84,16 @@ export function renderRecentVaultsList(recentVaults) {
       <span class="vault-arrow">→</span>
       <span class="vault-remove" title="Remove from list">✕</span>
     `;
-    el.querySelector('.vault-info').onclick = () =>
-      import('./main.js').then(m => m.handleOpenVault(vp));
-    el.querySelector('.vault-icon').onclick = () =>
-      import('./main.js').then(m => m.handleOpenVault(vp));
-    el.querySelector('.vault-arrow').onclick = () =>
-      import('./main.js').then(m => m.handleOpenVault(vp));
+
+    const open = () => openVaultCb && openVaultCb(vp);
+    el.querySelector('.vault-info').onclick  = open;
+    el.querySelector('.vault-icon').onclick  = open;
+    el.querySelector('.vault-arrow').onclick = open;
     el.querySelector('.vault-remove').onclick = async e => {
       e.stopPropagation();
       state.recentVaults = state.recentVaults.filter(v => v !== vp);
       await saveGlobalConfig({ recentVaults: state.recentVaults });
-      renderRecentVaultsList(state.recentVaults);
+      renderRecentVaultsList(state.recentVaults, openVaultCb);
     };
     container.appendChild(el);
   });

@@ -1,4 +1,4 @@
-import { exists, readDir, readTextFile, writeTextFile, mkdir } from '@tauri-apps/plugin-fs';
+import { exists, readDir, readTextFile, writeTextFile, mkdir, remove } from '@tauri-apps/plugin-fs';
 
 export const BUILT_IN_THEMES = {
   dark: {
@@ -99,7 +99,6 @@ export async function saveCustomTheme(vaultPath, theme) {
 }
 
 export async function deleteCustomTheme(vaultPath, fileName) {
-  const { remove } = await import('@tauri-apps/plugin-fs');
   const path = vaultPath.replace(/\\/g, '/') + '/.lapis/themes/' + fileName;
   await remove(path);
 }

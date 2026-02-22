@@ -203,7 +203,7 @@ export function renderRecentSidebar(recentFiles) {
     el.className = 'recent-sidebar-item';
     el.textContent = name;
     el.title = fp;
-    el.onclick = () => import('./main.js').then(m => m.handleOpenFile(fp, null));
+    el.onclick = () => callbacks.openFile(fp, null);
     list.appendChild(el);
   });
 }

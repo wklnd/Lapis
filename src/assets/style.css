@@ -267,6 +267,7 @@ html, body {
 /* ── EDITOR AREA ──────────────────────────────────────────────── */
 #editor-wrap {
   flex: 1;
+  min-width: 0;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -275,8 +276,11 @@ html, body {
 
 #editor-root {
   flex: 1;
+  min-height: 0;
   overflow: hidden;
   background: var(--bg-editor);
+  display: flex;
+  flex-direction: column;
 }
 
 #no-file {
@@ -289,9 +293,23 @@ html, body {
   background: var(--bg-editor);
 }
 
-.cm-editor { height: 100%; font-size: var(--editor-font-size, 16px); }
+.cm-activeLine          { background: transparent !important; }
+.cm-activeLineGutter    { background: transparent !important; }
+.cm-editor.cm-focused   { outline: none !important; }
+.cm-selectionBackground { background: transparent !important; }
+
+.cm-editor {
+  flex: 1;
+  min-height: 0;
+  width: 100% !important;
+  font-size: var(--editor-font-size, 16px);
+}
+
 .cm-editor.cm-focused { outline: none; }
-.cm-scroller      { padding: 40px; }
+
+.cm-scroller {
+  overflow: auto !important;
+}
 
 /* ── HORIZONTAL RULE ──────────────────────────────────────────── */
 .cm-hr-line {

@@ -1,5 +1,5 @@
 import { openPalette } from './palette.js';
-import { closeTab, getActiveTab, getAllTabs, setActiveTab } from './tabs.js';
+import { closeTab, getActiveTab, getAllTabs, setActiveTab, markClean } from './tabs.js';
 
 let _newFile   = null;
 let _openFile  = null;
@@ -50,13 +50,9 @@ export function initShortcuts({ newFile, openFile }) {
       // Ctrl+S — force save (editor autosaves but this is reassuring)
       case 's':
         e.preventDefault();
-        // autosave already handles this — just flash the tab clean
         const activeTab = getActiveTab();
-        if (activeTab) {
-          const { markClean } = await import('./tabs.js');
-          markClean(activeTab);
-        }
-        break;
+        if (activeTab) markClean(activeTab);
+  break;
     }
   });
 }

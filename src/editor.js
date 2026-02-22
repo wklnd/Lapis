@@ -1,5 +1,8 @@
-import { EditorView, basicSetup } from 'codemirror';
-import { ViewPlugin, Decoration, WidgetType } from '@codemirror/view';
+import { EditorView } from 'codemirror';
+import { keymap, highlightActiveLine, ViewPlugin, Decoration, WidgetType } from '@codemirror/view';
+import { defaultKeymap, historyKeymap, history } from '@codemirror/commands';
+import { bracketMatching } from '@codemirror/language';
+import { closeBrackets } from '@codemirror/autocomplete';
 import { RangeSetBuilder } from '@codemirror/state';
 import { markdown } from '@codemirror/lang-markdown';
 import { HighlightStyle, syntaxHighlighting } from '@codemirror/language';
@@ -7,6 +10,15 @@ import { tags } from '@lezer/highlight';
 import { writeTextFile } from '@tauri-apps/plugin-fs';
 import { markDirty, markClean } from './tabs.js';
 import { countAndUpdate } from './statusbar.js';
+
+// ─── Manual setup (no line numbers) ──────────────────────────────────────────
+const manualSetup = [
+  history(),
+  keymap.of([...defaultKeymap, ...historyKeymap]),
+  bracketMatching(),
+  closeBrackets(),
+  highlightActiveLine(),
+];
 
 // ─── HR Widget ────────────────────────────────────────────────────────────────
 class HRWidget extends WidgetType {
@@ -101,26 +113,26 @@ const markdownDecorations = ViewPlugin.fromClass(class {
   }
 }, { decorations: v => v.decorations });
 
-// ─── Build extensions (shared between openFile and reloadEditor) ──────────────
+// ─── Build extensions ─────────────────────────────────────────────────────────
 function buildExtensions(filePath) {
   return [
-    basicSetup,
+    manualSetup,
     markdown(),
     buildEditorTheme(),
     buildHighlightStyle(),
     markdownDecorations,
     EditorView.lineWrapping,
     EditorView.updateListener.of(update => {
-    if (update.docChanged) {
+      if (update.docChanged) {
         markDirty(filePath);
         const text = update.state.doc.toString();
         countAndUpdate(filePath, text);
         clearTimeout(saveTimeout);
         saveTimeout = setTimeout(async () => {
-        await writeTextFile(filePath, text);
-        markClean(filePath);
+          await writeTextFile(filePath, text);
+          markClean(filePath);
         }, 300);
-    }
+      }
     }),
   ];
 }
@@ -130,16 +142,16 @@ export function buildEditorTheme() {
   const s   = getComputedStyle(document.documentElement);
   const get = v => s.getPropertyValue('--' + v).trim();
   return EditorView.theme({
-    '&':                       { background: get('bg-editor'),  color: get('text-primary') },
-    '.cm-content':             { paddingLeft: '40px', caretColor: get('accent') },
+    '&':                       { background: get('bg-editor'), color: get('text-primary'), height: '100%' },
+    '.cm-content':             { paddingLeft: '40px', caretColor: get('accent'), paddingBottom: '40px' },
     '.cm-gutters':             { display: 'none' },
     '.cm-activeLine':          { background: 'transparent' },
     '.cm-cursor':              { borderLeftColor: get('accent') },
     '.cm-selectionBackground': { background: get('accent') + '44 !important' },
     '.cm-line':                { color: get('text-primary') },
-    '.cm-scroller':            { fontFamily: 'inherit' },
+    '.cm-scroller':            { fontFamily: 'inherit', overflow: 'auto', padding: '40px' },
     '.cm-focused':             { outline: 'none' },
-    '.cm-editor':              { background: get('bg-editor') },
+    '.cm-editor':              { background: get('bg-editor'), height: '100%' },
   }, { dark: true });
 }
 
@@ -200,7 +212,7 @@ export async function openFile(filePath, itemEl, { readTextFile, recentFiles, cu
 
   document.getElementById('no-file').style.display = 'none';
   const root = document.getElementById('editor-root');
-  root.style.display = 'block';
+  root.style.display = 'flex';
   root.innerHTML = '';
   destroyEditor();
 
@@ -209,6 +221,7 @@ export async function openFile(filePath, itemEl, { readTextFile, recentFiles, cu
     extensions: buildExtensions(filePath),
     parent: root,
   });
+
   countAndUpdate(filePath, content);
   recentFiles.unshift(filePath);
   const deduped = [...new Set(recentFiles)].slice(0, 8);

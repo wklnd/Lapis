@@ -10,5 +10,24 @@ export default defineConfig({
   build: {
     outDir: '../dist',
     emptyOutDir: true,
+    target: 'es2015',
+    cssCodeSplit: false,
+    rollupOptions: {
+      output: {
+        manualChunks: undefined,
+      }
+    }
+  },
+  optimizeDeps: {
+    include: [
+      'codemirror',
+      '@codemirror/view',
+      '@codemirror/state',
+      '@codemirror/language',
+      '@codemirror/lang-markdown',
+      '@codemirror/commands',
+      '@codemirror/autocomplete',
+      '@lezer/highlight',
+    ]
   }
 })

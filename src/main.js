@@ -1,18 +1,21 @@
 import { readTextFile, writeTextFile, exists } from '@tauri-apps/plugin-fs';
 import { state, openVault, showWelcome, renderRecentVaultsList, handleCreateVault, handleOpenVaultDialog, saveVaultConfig, loadVaultConfig, loadGlobalConfig } from './vault.js';
 import { buildFileTree } from './filetree.js';
-import { openFile as _openFile, destroyEditor } from './editor.js';
+import { openFile as _openFile } from './editor.js';
 import { initContextMenu, showContextMenu } from './contextmenu.js';
 import { showModal } from './modal.js';
-import { initSettings, closeSettings, loadAndApplyTheme, setVaultPath } from './settings.js';
+import { initSettings, openSettings, closeSettings, loadAndApplyTheme, setVaultPath } from './settings.js';
 import { initTabs, openTab, clearTabs, restoreTabs } from './tabs.js';
-import { initPalette, registerCommands } from './palette.js';
-import { openSettings } from './settings.js';
-import { openPalette } from './palette.js';
+import { initPalette } from './palette.js';
 import { initCommands } from './commands.js';
 import { initShortcuts } from './shortcuts.js';
 import { initResize } from './resize.js';
-import { initStatusBar } from './statusbar.js'
+import { initStatusBar } from './statusbar.js';
+
+// ─── Vault list helper (always passes handleOpenVault as callback) ─────────────
+function renderVaultsList(vaults) {
+  renderRecentVaultsList(vaults, handleOpenVault);
+}
 
 // ─── Shared callbacks ─────────────────────────────────────────────────────────
 const callbacks = {
@@ -43,7 +46,8 @@ export async function handleOpenFile(filePath, itemEl) {
     saveVaultConfig,
   });
 }
-//  new file
+
+// ─── New file ─────────────────────────────────────────────────────────────────
 async function newFile() {
   const name = await showModal({ title: 'New File', placeholder: 'filename', confirmText: 'Create' });
   if (!name) return;
@@ -58,7 +62,7 @@ export async function handleOpenVault(vaultPath) {
   clearTabs();
   await openVault(vaultPath, {
     buildFileTree: callbacks.buildFileTree,
-    renderRecentVaultsList,
+    renderRecentVaultsList: renderVaultsList,
   });
   const cfg = await loadVaultConfig(vaultPath);
   await loadAndApplyTheme(vaultPath, cfg);
@@ -72,16 +76,15 @@ document.getElementById('btn-new-file').addEventListener('click', newFile);
 // ─── Vault switcher ───────────────────────────────────────────────────────────
 document.getElementById('vault-switcher').addEventListener('click', () => {
   clearTabs();
-  showWelcome({ renderRecentVaultsList });
+  showWelcome({ renderRecentVaultsList: renderVaultsList });
 });
 
 // ─── Welcome screen buttons ───────────────────────────────────────────────────
 document.getElementById('btn-open').addEventListener('click', () =>
-  handleOpenVaultDialog({ buildFileTree: callbacks.buildFileTree, renderRecentVaultsList })
+  handleOpenVaultDialog({ buildFileTree: callbacks.buildFileTree, renderRecentVaultsList: renderVaultsList })
 );
-
 document.getElementById('btn-create').addEventListener('click', () =>
-  handleCreateVault({ buildFileTree: callbacks.buildFileTree, renderRecentVaultsList })
+  handleCreateVault({ buildFileTree: callbacks.buildFileTree, renderRecentVaultsList: renderVaultsList })
 );
 
 // ─── Settings ─────────────────────────────────────────────────────────────────
@@ -103,7 +106,6 @@ document.getElementById('search-box').addEventListener('input', e => {
   }, 150);
 });
 
-
 // ─── Init ─────────────────────────────────────────────────────────────────────
 initContextMenu(callbacks);
 initSettings({ getVaultPath: () => state.currentVaultPath, saveVaultConfig, loadVaultConfig });
@@ -123,7 +125,7 @@ initStatusBar();
 async function boot() {
   const cfg = await loadGlobalConfig();
   state.recentVaults = cfg.recentVaults || [];
-  renderRecentVaultsList(state.recentVaults);
+  renderVaultsList(state.recentVaults);
   if (state.recentVaults.length > 0) {
     const last = state.recentVaults[0];
     if (await exists(last)) await handleOpenVault(last);
