@@ -320,6 +320,32 @@ html, body {
   border-radius: 2px;
 }
 
+/* ── TABLES ───────────────────────────────────────────────────── */
+.cm-table {
+  border-collapse: collapse;
+  width: 100%;
+  margin: 8px 0;
+  font-size: 0.9em;
+}
+.cm-table th,
+.cm-table td {
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  text-align: left;
+  color: var(--text-primary);
+}
+.cm-table th {
+  background: var(--bg-tertiary);
+  font-weight: bold;
+  color: var(--accent);
+}
+.cm-table tr:nth-child(even) td {
+  background: var(--bg-tertiary);
+}
+.cm-table tr:hover td {
+  background: var(--bg-secondary);
+}
+
 /* ── TABS ─────────────────────────────────────────────────────── */
 #tab-bar {
   display: flex;

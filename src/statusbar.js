@@ -13,7 +13,7 @@ export function updateStatus(filePath, words, chars) {
   const name = filePath
     ? filePath.replace(/\\/g, '/').split('/').pop()
     : '';
-
+    
   left.textContent  = name;
   right.innerHTML   = filePath
     ? `<span>${words} words</span><span>${chars} chars</span>`

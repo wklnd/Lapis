@@ -36,6 +36,49 @@ class HRWidget extends WidgetType {
   ignoreEvent() { return false; }
 }
 
+// ─── Table Widget ─────────────────────────────────────────────────────────────
+class TableWidget extends WidgetType {
+  constructor(rows, hasHeader, from) {
+    super();
+    this.rows      = rows;
+    this.hasHeader = hasHeader;
+    this.from      = from;
+  }
+
+  toDOM(view) {
+    const table = document.createElement('table');
+    table.className = 'cm-table';
+    table.style.cursor = 'pointer';
+
+    this.rows.forEach((row, i) => {
+      const tr = document.createElement('tr');
+      row.forEach(cell => {
+        const td = document.createElement(i === 0 && this.hasHeader ? 'th' : 'td');
+        td.textContent = cell.trim();
+        tr.appendChild(td);
+      });
+      table.appendChild(tr);
+    });
+    table.addEventListener('mousedown', e => {
+      e.preventDefault();
+      view.dispatch({
+        selection: { anchor: this.from + 1 },
+        scrollIntoView: true,
+      });
+      view.focus();
+    });
+
+    return table;
+  }
+
+  ignoreEvent() { return false; }
+
+  eq(other) {
+    return JSON.stringify(other.rows) === JSON.stringify(this.rows) &&
+           other.hasHeader === this.hasHeader;
+  }
+}
+
 // ─── Code block widget ────────────────────────────────────────────────────────
 class CodeBlockWidget extends WidgetType {
   constructor(code, lang) {
@@ -211,58 +254,138 @@ const markdownDecorations = ViewPlugin.fromClass(class {
       this.decorations = this.build(u.view);
   }
 
-  build(view) {
+build(view) {
     const doc   = view.state.doc;
     const decos = [];
-    let inCodeBlock  = false;
-    let inCodeLang   = '';
-    let codeStart    = -1;
-    let codeLines    = [];
-    let codeStartPos = -1;
+
+    // ── Pre-pass: find and handle table blocks ────────────────────────────────
+    const tableLines = new Set();
+    let i = 1;
+    while (i <= doc.lines) {
+      const line = doc.line(i);
+      const text = line.text.trim();
+
+      if (text.startsWith('|') && text.endsWith('|')) {
+        const blockStart = i;
+        const blockLines = [];
+        let j = i;
+        while (j <= doc.lines) {
+          const tl = doc.line(j).text.trim();
+          if (tl.startsWith('|') && tl.endsWith('|')) {
+            blockLines.push({ lineNum: j, text: tl });
+            j++;
+          } else break;
+        }
+
+        if (blockLines.length >= 2) {
+          const blockFrom = doc.line(blockStart).from;
+          const blockTo   = doc.line(j - 1).to;
+          const cursorIn  = cursorInRange(view, blockFrom, blockTo);
+
+          if (cursorIn) {
+            // Cursor inside — show raw
+            for (const bl of blockLines) {
+              const bl_line = doc.line(bl.lineNum);
+              decos.push({ from: bl_line.from, to: bl_line.to,
+                deco: Decoration.mark({ attributes: { style: 'color:var(--text-primary);font-family:monospace;' } }) });
+              tableLines.add(bl.lineNum);
+            }
+          } else {
+            // Parse rows, skip separator lines
+            const rows = [];
+            for (const bl of blockLines) {
+              if (bl.text.match(/^\|[\s\-\|:]+\|$/)) continue;
+              const cells = bl.text
+                .split('|')
+                .filter((_, ci, arr) => ci > 0 && ci < arr.length - 1)
+                .map(c => c.trim());
+              rows.push(cells);
+            }
+
+            const hasHeader = blockLines.length >= 2 &&
+              blockLines[1].text.match(/^\|[\s\-\|:]+\|$/);
+
+            if (rows.length > 0) {
+              // Hide all raw table lines
+              for (const bl of blockLines) {
+                const bl_line = doc.line(bl.lineNum);
+                decos.push({ from: bl_line.from, to: bl_line.to,
+                  deco: Decoration.mark({ attributes: { style: 'display:none;font-size:0;line-height:0;' } }) });
+                tableLines.add(bl.lineNum);
+              }
+              // Insert widget at start of first table line
+              decos.push({
+                from: doc.line(blockStart).from,
+                to:   doc.line(blockStart).from,
+                deco: Decoration.widget({
+                  widget: new TableWidget(rows, hasHeader, doc.line(blockStart).from),
+                  side: -1,
+                })
+              });
+            }
+          }
+          i = j;
+          continue;
+        }
+      }
+      i++;
+    }
+
+    // ── Per-line decorations (skip table lines) ───────────────────────────────
+    let inCodeBlock   = false;
+    let inCodeLang    = '';
+    let codeBlockFrom = -1;
+    let codeBlockTo   = -1;
+    let codeLines     = [];
+    let openFenceLine = -1;
 
     for (let i = 1; i <= doc.lines; i++) {
+      if (tableLines.has(i)) continue;
+
       const line = doc.line(i);
       const text = line.text;
       const here = cursorOnLine(view, line);
 
-// ── Fenced code blocks ──
-if (text.trimStart().startsWith('```')) {
-  if (!inCodeBlock) {
-    inCodeBlock = true;
-    inCodeLang  = text.trimStart().slice(3).trim().toLowerCase();
-    // Show opening fence dimmed, never hide it
-    decos.push({ from: line.from, to: line.to,
-      deco: Decoration.mark({ attributes: { style: 'font-family:monospace;color:var(--text-muted);background:var(--bg-tertiary);display:block;padding:2px 12px;border-radius:6px 6px 0 0;' } }) });
-  } else {
-    inCodeBlock = false;
-    inCodeLang  = '';
-    decos.push({ from: line.from, to: line.to,
-      deco: Decoration.mark({ attributes: { style: 'font-family:monospace;color:var(--text-muted);background:var(--bg-tertiary);display:block;padding:2px 12px;border-radius:0 0 6px 6px;' } }) });
-  }
-  continue;
-}
+      // ── Fenced code blocks ──
+      if (text.trimStart().startsWith('```')) {
+        if (!inCodeBlock) {
+          inCodeBlock   = true;
+          inCodeLang    = text.trimStart().slice(3).trim().toLowerCase();
+          codeBlockFrom = line.from;
+          codeLines     = [];
+          openFenceLine = i;
+          if (!here) {
+            decos.push({ from: line.from, to: line.to,
+              deco: Decoration.mark({ attributes: { style: 'display:none;' } }) });
+          }
+        } else {
+          codeBlockTo = line.to;
+          const cursorIn = cursorInRange(view, codeBlockFrom, codeBlockTo);
+          inCodeBlock = false;
 
-if (inCodeBlock) {
-  const langColors = {
-    js: '#e5c07b', javascript: '#e5c07b',
-    ts: '#4ec9b0', typescript: '#4ec9b0',
-    python: '#dcdcaa', py: '#dcdcaa',
-    rust: '#ce9178',
-    css: '#d7ba7d',
-    html: '#f28b82',
-    json: '#ce9178',
-    bash: '#98c379', sh: '#98c379', shell: '#98c379',
-  };
-  const color = langColors[inCodeLang] || 'var(--accent)';
-  decos.push({ from: line.from, to: line.to,
-    deco: Decoration.mark({ attributes: { style: `font-family:monospace;color:${color};background:var(--bg-tertiary);display:block;padding:2px 12px;` } }) });
-  continue;
-}
+          if (cursorIn) {
+            for (let j = openFenceLine; j <= i; j++) {
+              const cl = doc.line(j);
+              decos.push({ from: cl.from, to: cl.to,
+                deco: Decoration.mark({ attributes: { style: 'font-family:monospace;color:var(--text-muted);background:var(--bg-tertiary);display:block;padding:1px 12px;' } }) });
+            }
+          } else {
+            if (!here) {
+              decos.push({ from: line.from, to: line.to,
+                deco: Decoration.mark({ attributes: { style: 'display:none;' } }) });
+            }
+          }
+          inCodeLang = '';
+          codeLines  = [];
+        }
+        continue;
+      }
 
       if (inCodeBlock) {
         codeLines.push(text);
         if (!here) {
-          decos.push({ from: line.from, to: line.to, deco: Decoration.mark({ attributes: { style: 'display:none;' } }) });
+          decos.push({ from: line.from, to: line.to,
+            deco: Decoration.mark({ attributes: { style: 'display:none;' } }) });
         }
         continue;
       }
@@ -339,16 +462,7 @@ if (inCodeBlock) {
         decos.push({ from: line.from, to: line.to,
           deco: Decoration.replace({ widget: new HRWidget() }) });
       }
-      // Task list (custom)
-      // @todo
-
-      // Tables
-      // @todo
-
     }
-
-    // Handle unclosed code block at end of doc — render lines as-is
-    // (no widget, just leave them styled)
 
     // Sort by position — required by RangeSetBuilder
     decos.sort((a, b) => a.from - b.from || a.to - b.to);
@@ -503,31 +617,27 @@ export async function reloadEditor(readTextFile) {
   });
 }
 
-export async function openFile(filePath, itemEl, { readTextFile, recentFiles, currentVaultPath, saveVaultConfig }) {
+export async function openFile(filePath, itemEl, { readTextFile, recentFiles, currentVaultPath, saveVaultConfig, loadVaultConfig }) {
   document.querySelectorAll('.tree-item').forEach(el => el.classList.remove('active'));
   if (itemEl) itemEl.classList.add('active');
-
   currentFilePath = filePath;
   const content   = await readTextFile(filePath);
-
   document.getElementById('no-file').style.display = 'none';
   const root = document.getElementById('editor-root');
   root.style.display = 'flex';
   root.innerHTML = '';
   destroyEditor();
-
   injectCodeBlockStyles();
-
   editorView = new EditorView({
     doc: content,
     extensions: buildExtensions(filePath),
     parent: root,
   });
-
   countAndUpdate(filePath, content);
   recentFiles.unshift(filePath);
   const deduped = [...new Set(recentFiles)].slice(0, 8);
   recentFiles.length = 0;
   recentFiles.push(...deduped);
-  saveVaultConfig(currentVaultPath, { recentFiles });
+  const existing = await loadVaultConfig(currentVaultPath);
+  await saveVaultConfig(currentVaultPath, { ...existing, recentFiles: deduped });
 }

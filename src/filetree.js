@@ -77,7 +77,7 @@ function buildFolder(fullPath, name, callbacks) {
   const el = document.createElement('div');
   el.className = 'tree-item folder';
   el.dataset.path = fullPath;
-  el.innerHTML = `<span class="folder-arrow">${isOpen ? '▾' : '▸'}</span> 📁 ${name}`;
+  el.innerHTML = `<span class="folder-arrow">${isOpen ? '▾' : '▸'}</span>${name}`;
 
   const childContainer = document.createElement('div');
   childContainer.className = 'tree-folder-children';
