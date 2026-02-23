@@ -3,9 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <title>Lapis</title>
-  <style>
-    @import url('./assets/style.css');
-  </style>
+  <link rel="stylesheet" href="./assets/style.css">
 </head>
 <body>
 
@@ -112,5 +110,49 @@
 </div>
 
 <script type="module" src="./main.js"></script>
+
+<style>
+  .cm-editor {
+    flex: 1 !important;
+    min-height: 0 !important;
+    background: var(--bg-editor) !important;
+    font-size: var(--editor-font-size, 16px) !important;
+  }
+  .cm-editor.cm-focused {
+    outline: none !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+  .cm-scroller {
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    padding: 40px 60px !important;
+    font-family: inherit !important;
+    height: 100% !important;
+  }
+  .cm-content {
+    max-width: 720px !important;
+    margin: 0 auto !important;
+    caret-color: var(--accent) !important;
+    padding-bottom: 200px !important;
+  }
+  .cm-gutters          { display: none !important; }
+  .cm-activeLine       { background: transparent !important; }
+  .cm-activeLineGutter { background: transparent !important; }
+  .cm-line             { color: var(--text-primary) !important; }
+  .cm-cursor           { border-left-color: var(--accent) !important; }
+  .cm-selectionBackground { background: rgba(167,139,250,0.2) !important; }
+  .cm-focused .cm-selectionBackground { background: rgba(167,139,250,0.2) !important; }
+
+  .cm-editor * { outline: none !important; box-shadow: none !important; }
+  .cm-editor, .cm-editor * { border-color: transparent !important; }
+  .cm-editor.cm-focused { outline: none !important; box-shadow: none !important; border: none !important; }
+
+  .cm-scroller::-webkit-scrollbar { width: 6px; }
+  .cm-scroller::-webkit-scrollbar-track { background: transparent; }
+  .cm-scroller::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  .cm-scroller::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+</style>
+
 </body>
 </html>

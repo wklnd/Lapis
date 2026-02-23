@@ -10,11 +10,16 @@ export default defineConfig({
   build: {
     outDir: '../dist',
     emptyOutDir: true,
-    target: 'es2015',
     cssCodeSplit: false,
+    cssMinify: false,
+    minify: false,
     rollupOptions: {
       output: {
-        manualChunks: undefined,
+        manualChunks(id) {
+          if (id.includes('codemirror') || id.includes('@codemirror') || id.includes('@lezer')) {
+            return 'codemirror';
+          }
+        }
       }
     }
   },
