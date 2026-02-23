@@ -61,7 +61,82 @@ export const BUILT_IN_THEMES = {
       'border':        '#ffffff',
       'sidebar-bg':    '#0a0a0a',
     }
+  },
+  'gruvbox-dark': {
+    name: 'Gruvbox Dark',
+    built_in: true,
+    colors: {
+      'bg-primary':    '#282828',   // dark0
+      'bg-secondary':  '#32302f',   // dark1
+      'bg-tertiary':   '#3c3836',   // dark2
+      'bg-editor':     '#1d2021',   // darker base
+      'text-primary':  '#ebdbb2',   // light1
+      'text-muted':    '#a89984',   // gray
+      'accent':        '#fabd2f',   // yellow
+      'border':        '#504945',   // dark4
+      'sidebar-bg':    '#282828',
+    }
+  },
+  'gruvbox-light': {
+    name: 'Gruvbox Light',
+    built_in: true,
+    colors: {
+    'bg-primary':    '#fbf1c7',   // light0
+    'bg-secondary':  '#f2e5bc',   // light1
+    'bg-tertiary':   '#ebdbb2',   // light2
+    'bg-editor':     '#f9f5d7',   // softer writing surface
+    'text-primary':  '#3c3836',   // dark2
+    'text-muted':    '#7c6f64',   // gray
+    'accent':        '#d79921',   // warm yellow
+    'border':        '#bdae93',
+    'sidebar-bg':    '#f2e5bc',
   }
+},
+  'vaporwave': {
+    name: 'Vaporwave',
+    built_in: true,
+    colors: {
+      'bg-primary':    '#1a1333',
+      'bg-secondary':  '#21194a',
+      'bg-tertiary':   '#2b1f66',
+      'bg-editor':     '#140f2b',
+      'text-primary':  '#f8f8ff',
+      'text-muted':    '#b8b4ff',
+      'accent':        '#ff71ce',  // neon pink
+      'border':        '#3d2c7a',
+      'sidebar-bg':    '#1a1333',
+    }
+},
+'soft-dark': {
+  name: 'Soft Dark',
+  built_in: true,
+  colors: {
+    'bg-primary':    '#1e1f24',
+    'bg-secondary':  '#24262c',
+    'bg-tertiary':   '#2c2f36',
+    'bg-editor':     '#1a1c21',
+    'text-primary':  '#e6e6e6',
+    'text-muted':    '#9aa0a6',
+    'accent':        '#5ea1ff',  // calm blue
+    'border':        '#343740',
+    'sidebar-bg':    '#1e1f24',
+  }
+},
+'soft-light': {
+  name: 'Soft Light',
+  built_in: true,
+  colors: {
+    'bg-primary':    '#f5f6f8',
+    'bg-secondary':  '#eceef2',
+    'bg-tertiary':   '#e2e5ea',
+    'bg-editor':     '#ffffff',
+    'text-primary':  '#2b2f36',
+    'text-muted':    '#6b7280',
+    'accent':        '#3b82f6',
+    'border':        '#d6d9df',
+    'sidebar-bg':    '#eceef2',
+  }
+}
 };
 
 export function applyTheme(colors) {
