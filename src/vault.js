@@ -84,10 +84,9 @@ export function renderRecentVaultsList(recentVaults, openVaultCb) {
       <span class="vault-remove" title="Remove from list">✕</span>
     `;
 
-    const open = () => openVaultCb && openVaultCb(vp);
-    el.querySelector('.vault-info').onclick  = open;
-    el.querySelector('.vault-icon').onclick  = open;
-    el.querySelector('.vault-arrow').onclick = open;
+    const openCb = () => openVaultCb && openVaultCb(vp);
+    el.querySelector('.vault-info').onclick  = openCb;
+    el.querySelector('.vault-arrow').onclick = openCb;
     el.querySelector('.vault-remove').onclick = async e => {
       e.stopPropagation();
       state.recentVaults = state.recentVaults.filter(v => v !== vp);

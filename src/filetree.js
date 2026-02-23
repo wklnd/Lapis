@@ -132,7 +132,7 @@ function buildFile(fullPath, name, callbacks) {
   const item = document.createElement('div');
   item.className = 'tree-item file';
   item.dataset.path = fullPath;
-  item.textContent = '📄 ' + name;
+  item.textContent = name;
 
   const currentFile = (callbacks.getCurrentFilePath() || '').replace(/\\/g, '/');
   if (fullPath === currentFile) item.classList.add('active');
