@@ -108,6 +108,12 @@ const markdownDecorations = ViewPlugin.fromClass(class {
       if (text.trim() === '---' && !here) {
         builder.add(line.from, line.to, Decoration.replace({ widget: new HRWidget() }));
       }
+      // Task list (custom)
+      // @todo
+
+      // Tables
+      // @todo
+
     }
     return builder.finish();
   }

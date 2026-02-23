@@ -1,6 +1,21 @@
 import { exists, readDir, readTextFile, writeTextFile, mkdir, remove } from '@tauri-apps/plugin-fs';
 
 export const BUILT_IN_THEMES = {
+    light: {
+    name: 'Light',
+    built_in: true,
+    colors: {
+      'bg-primary':    '#ffffff',
+      'bg-secondary':  '#f5f5f5',
+      'bg-tertiary':   '#ebebeb',
+      'bg-editor':     '#ffffff',
+      'text-primary':  '#1a1a1a',
+      'text-muted':    '#888',
+      'accent':        '#26619c',
+      'border':        '#ddd',
+      'sidebar-bg':    '#f0f0f0',
+    }
+  },
   dark: {
     name: 'Dark',
     built_in: true,
@@ -16,21 +31,7 @@ export const BUILT_IN_THEMES = {
       'sidebar-bg':    '#12121f',
     }
   },
-  light: {
-    name: 'Light',
-    built_in: true,
-    colors: {
-      'bg-primary':    '#ffffff',
-      'bg-secondary':  '#f5f5f5',
-      'bg-tertiary':   '#ebebeb',
-      'bg-editor':     '#ffffff',
-      'text-primary':  '#1a1a1a',
-      'text-muted':    '#888',
-      'accent':        '#7c3aed',
-      'border':        '#ddd',
-      'sidebar-bg':    '#f0f0f0',
-    }
-  },
+
   sepia: {
     name: 'Sepia',
     built_in: true,

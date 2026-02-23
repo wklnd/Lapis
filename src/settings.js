@@ -6,7 +6,7 @@ import { readTextFile } from '@tauri-apps/plugin-fs';
 let _vaultPath   = null;
 let _saveConfig  = null;
 let _loadConfig  = null;
-let currentThemeId = 'dark';
+let currentThemeId = 'light';
 
 export function initSettings({ getVaultPath, saveVaultConfig, loadVaultConfig }) {
   _saveConfig = saveVaultConfig;
@@ -18,7 +18,7 @@ export function getCurrentThemeId() { return currentThemeId; }
 
 export async function loadAndApplyTheme(vaultPath, config) {
   _vaultPath = vaultPath;
-  const themeId = config.theme || 'dark';
+  const themeId = config.theme || 'light';
   currentThemeId = themeId;
   const fontSize = localStorage.getItem('lapis-font-size') || '16';
   document.documentElement.style.setProperty('--editor-font-size', fontSize + 'px');
@@ -29,7 +29,7 @@ export async function loadAndApplyTheme(vaultPath, config) {
     const custom = await loadCustomThemes(vaultPath);
     const found  = custom.find(t => t._file === themeId);
     if (found) applyTheme(found.colors);
-    else applyTheme(BUILT_IN_THEMES.dark.colors);
+    else applyTheme(BUILT_IN_THEMES.light.colors);
   }
 }
 
@@ -137,7 +137,7 @@ function buildThemeCard(id, theme, isCustom) {
     </div>
     <div class="theme-card-footer">
       <span class="theme-name">${theme.name}</span>
-      ${isCustom ? '<button class="theme-delete">🗑️</button>' : ''}
+      ${isCustom ? '<button class="theme-delete">X</button>' : ''}
     </div>
   `;
 
@@ -179,7 +179,7 @@ async function createNewTheme(container) {
   if (!name || !_vaultPath) return;
 
   // Start from current theme as base
-  const base = BUILT_IN_THEMES[currentThemeId] || BUILT_IN_THEMES.dark;
+  const base = BUILT_IN_THEMES[currentThemeId] || BUILT_IN_THEMES.light;
   const newTheme = { name, colors: { ...base.colors } };
   await saveCustomTheme(_vaultPath, newTheme);
   renderSettingsPage();

@@ -65,7 +65,8 @@ export async function handleOpenVault(vaultPath) {
     renderRecentVaultsList: renderVaultsList,
   });
   const cfg = await loadVaultConfig(vaultPath);
-  await loadAndApplyTheme(vaultPath, cfg);
+  //await loadAndApplyTheme(vaultPath, cfg);
+  
   setVaultPath(vaultPath);
   await restoreTabs(vaultPath, handleOpenFile);
 }

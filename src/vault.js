@@ -76,7 +76,6 @@ export function renderRecentVaultsList(recentVaults, openVaultCb) {
     const el = document.createElement('div');
     el.className = 'recent-vault-card';
     el.innerHTML = `
-      <span class="vault-icon">📁</span>
       <div class="vault-info">
         <strong>${name}</strong>
         <span>${vp}</span>
