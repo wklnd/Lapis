@@ -1,5 +1,6 @@
 import { openPalette } from './palette.js';
 import { closeTab, getActiveTab, getAllTabs, setActiveTab, markClean } from './tabs.js';
+import { getEditorView } from './editor.js';
 
 let _newFile   = null;
 let _openFile  = null;
@@ -52,7 +53,31 @@ export function initShortcuts({ newFile, openFile }) {
         e.preventDefault();
         const activeTab = getActiveTab();
         if (activeTab) markClean(activeTab);
-  break;
+        break;
+
+      // Ctrl+B - set bold (TODO: move to editor shortcuts)
+      case 'b': {
+          e.preventDefault();
+          const view = getEditorView();
+          if (!view) break;
+          const { from, to } = view.state.selection.main;
+          const selected = view.state.sliceDoc(from, to);
+          if (selected) {
+              // Wrap selection in bold
+              view.dispatch({
+                  changes: { from, to, insert: `**${selected}**` },
+                  selection: { anchor: from + 2, head: to + 2 },
+              });
+          } else {
+              // No selection — insert markers and place cursor between them
+              view.dispatch({
+                  changes: { from, insert: '****' },
+                  selection: { anchor: from + 2 },
+              });
+          }
+          view.focus();
+          break;
+      }
     }
   });
 }

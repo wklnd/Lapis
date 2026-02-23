@@ -127,28 +127,28 @@ function renderTabs() {
 
 // ─── Persist tabs to vault config ─────────────────────────────────────────────
 async function persistTabs() {
-    console.log('persistTabs called', { _saveConfigCb, _getVaultPath });
+    //console.log('persistTabs called', { _saveConfigCb, _getVaultPath });
     if (!_saveConfigCb || !_getVaultPath) {
-        console.log('persistTabs bailing — missing callbacks');
+        //console.log('persistTabs bailing — missing callbacks');
         return;
     }
     const vaultPath = _getVaultPath();
-    console.log('persistTabs vaultPath:', vaultPath);
+    //console.log('persistTabs vaultPath:', vaultPath);
     if (!vaultPath) {
-        console.log('persistTabs bailing — no vaultPath');
+        //console.log('persistTabs bailing — no vaultPath');
         return;
     }
     try {
         const existing = await _loadConfigCb(vaultPath);
-        console.log('persistTabs existing config:', existing);
+        //console.log('persistTabs existing config:', existing);
         const toSave = {
             ...existing,
             openTabs:  tabs.map(t => t.path),
             activeTab: activeTab,
         };
-        console.log('persistTabs saving:', toSave);
+        //console.log('persistTabs saving:', toSave);
         await _saveConfigCb(vaultPath, toSave);
-        console.log('persistTabs done');
+        //console.log('persistTabs done');
     } catch(e) {
         console.error('persistTabs failed:', e);
     }
@@ -159,10 +159,10 @@ export async function restoreTabs(vaultPath, openFileCb) {
     if (!_loadConfigCb) return;
     try {
         const cfg         = await _loadConfigCb(vaultPath);
-        console.log('restoreTabs config:', cfg);
+        //console.log('restoreTabs config:', cfg);
         const savedTabs   = cfg.openTabs  || [];
         const savedActive = cfg.activeTab || null;
-        console.log('restoreTabs savedTabs:', savedTabs, 'savedActive:', savedActive);
+        //console.log('restoreTabs savedTabs:', savedTabs, 'savedActive:', savedActive);
         for (const path of savedTabs) {
             const name = path.replace(/\\/g, '/').split('/').pop();
             tabs.push({ path, name, dirty: false });
