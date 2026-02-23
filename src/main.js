@@ -1,6 +1,6 @@
 import { readTextFile, writeTextFile, exists } from '@tauri-apps/plugin-fs';
 import { state, openVault, showWelcome, renderRecentVaultsList, handleCreateVault, handleOpenVaultDialog, saveVaultConfig, loadVaultConfig, loadGlobalConfig } from './vault.js';
-import { buildFileTree } from './filetree.js';
+import { buildFileTree, allFiles} from './filetree.js';
 import { openFile as _openFile } from './editor.js';
 import { initContextMenu, showContextMenu } from './contextmenu.js';
 import { showModal } from './modal.js';
@@ -11,6 +11,7 @@ import { initCommands } from './commands.js';
 import { initShortcuts } from './shortcuts.js';
 import { initResize } from './resize.js';
 import { initStatusBar } from './statusbar.js';
+import { GlobalSearch } from "./globalsearch.js";
 
 // ─── Vault list helper ────────────────────────────────────────────────────────
 function renderVaultsList(vaults) {
@@ -106,6 +107,9 @@ document.getElementById('search-box').addEventListener('input', e => {
         });
     }, 150);
 });
+
+// ─── Global Search  ───────────────────────────────────────────────────────────────────
+new GlobalSearch(readTextFile, handleOpenFile);
 
 // ─── Init ─────────────────────────────────────────────────────────────────────
 initContextMenu(callbacks);
