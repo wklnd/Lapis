@@ -41,7 +41,7 @@ Most markdown editors are either too heavy (Obsidian, Notion) or too bare-bones.
 You'll need [Rust](https://rustup.rs/) and Node.js installed.
 
 ```bash
-git clone https://github.com/yourname/lapis
+git clone https://github.com/wklnd/lapis
 cd lapis
 npm install
 npm run tauri dev

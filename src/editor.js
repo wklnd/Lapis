@@ -339,6 +339,12 @@ if (inCodeBlock) {
         decos.push({ from: line.from, to: line.to,
           deco: Decoration.replace({ widget: new HRWidget() }) });
       }
+      // Task list (custom)
+      // @todo
+
+      // Tables
+      // @todo
+
     }
 
     // Handle unclosed code block at end of doc — render lines as-is

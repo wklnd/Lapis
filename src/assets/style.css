@@ -8,17 +8,17 @@ html, body {
   font-family: sans-serif;
 }
 
-/* ── CSS VARIABLES (default dark theme) ───────────────────────── */
+/* ── CSS VARIABLES (default light theme) ───────────────────────── */
 :root {
-  --bg-primary:   #1a1a2e;
-  --bg-secondary: #12121f;
-  --bg-tertiary:  #15152a;
-  --bg-editor:    #1e1e1e;
-  --text-primary: #d4d4d4;
-  --text-muted:   #666;
-  --accent:       #a78bfa;
-  --border:       #2a2a3e;
-  --sidebar-bg:   #12121f;
+  --bg-primary:   #ffffff;
+  --bg-secondary: #f5f5f5;
+  --bg-tertiary:  #ebebeb;
+  --bg-editor:    #ffffff;
+  --text-primary: #1a1a1a;
+  --text-muted:   #888;
+  --accent:       #26619c;
+  --border:       #ddd;
+  --sidebar-bg:   #f0f0f0;
 }
 
 /* ── WELCOME SCREEN ───────────────────────────────────────────── */
