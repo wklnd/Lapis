@@ -47,10 +47,8 @@ export class GlobalSearch {
 
       try {
         
-        const matches = await this.searchVault(query, allFiles);
-        alert("searchVault returned " + matches.length + " result files");
-        this.renderResults(matches, query);
-        alert("renderResults called");
+        this.searchResults.innerHTML = "";
+        await this.searchVault(query, allFiles);
       } catch (err) {
         alert("Error in search: " + err);
       }
@@ -76,40 +74,75 @@ export class GlobalSearch {
       "<div style='padding:10px;color:#888'>No search query</div>";
   }
 
+  escapeRegExp(string) {
+  return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+renderSingleFileResult(file, matches) {
+  const fileDiv = document.createElement("div");
+  fileDiv.classList.add("search-file");
+  fileDiv.dataset.path = file.path;
+  fileDiv.style.cursor = "pointer";
+
+  fileDiv.addEventListener("click", () => {
+    this.openFile(file.path, null);
+    this.closeGlobalSearch();
+  });
+
+  fileDiv.innerHTML = `
+    <div>${file.name}</div>
+    <div style="font-size:12px;color:#888;">${file.path}</div>
+  `;
+
+  matches.forEach(match => {
+    const matchDiv = document.createElement("div");
+    matchDiv.style.paddingLeft = "10px";
+    matchDiv.style.fontSize = "14px";
+    matchDiv.innerHTML = `${match.lineNumber}: ${match.text}`;
+    fileDiv.appendChild(matchDiv);
+  });
+
+  this.searchResults.appendChild(fileDiv);
+}
+
   // --- Search all files for matching lines ---
   async searchVault(query, allFiles) {
-    const lowerQuery = query.toLowerCase();
-    const results = [];
+  const lowerQuery = query.toLowerCase();
+  const escapedQuery = this.escapeRegExp(query);
+  const regex = new RegExp(`(${escapedQuery})`, "gi");
 
-    for (const file of allFiles) {
-      try {
-        alert("Reading file: " + file.path);
-        const content = await this.readTextFile(file.path);
-        const lines = content.split("\n");
-        const matches = [];
+  let foundAny = false;
 
-        // Collect lines that include query
-        lines.forEach((line, i) => {
-          if (line.toLowerCase().includes(lowerQuery)) {
-            matches.push({ lineNumber: i + 1, text: line });
-          }
-        });
+  for (const file of allFiles) {
+    try {
+      const content = await this.readTextFile(file.path);
+      const lines = content.split("\n");
+      const matches = [];
 
-        if (matches.length > 0) {
-          results.push({
-            filename: file.name,
-            path: file.path,
-            matches,
+      lines.forEach((line, i) => {
+        if (line.toLowerCase().includes(lowerQuery)) {
+          matches.push({
+            lineNumber: i + 1,
+            text: line.replace(regex, '<span class="highlight">$1</span>')
           });
-          alert("Matches found in file: " + file.name);
         }
-      } catch (err) {
-        alert("Failed to read file: " + file.path);
-       }
+      });
+
+      if (matches.length > 0) {
+        foundAny = true;
+        this.renderSingleFileResult(file, matches);
+      }
+
+    } catch (err) {
+      console.error("Failed reading file:", file.path);
     }
-    alert("searchVault completed. Total result files: " + results.length);
-    return results;
   }
+
+  if (!foundAny) {
+    this.searchResults.innerHTML =
+      "<div style='padding:10px;color:#888'>No results found</div>";
+  }
+}
 
   // --- Render search results into overlay ---
   renderResults(results, query = "") {
@@ -144,9 +177,13 @@ export class GlobalSearch {
         const matchDiv = document.createElement("div");
         matchDiv.style.paddingLeft = "10px";
         matchDiv.style.fontSize = "14px";
-        const regex = new RegExp(`(${query})`, "gi");
-        const highlightedLine =
-          match.text.replace(regex, '<span class="highlight">$1</span>');
+        const escapedQuery = this.escapeRegExp(query);
+        const regex = new RegExp(`\\b(${escapedQuery})\\b`, "gi");
+
+        const highlightedLine = match.text.replace(
+        regex,
+        '<span class="highlight">$1</span>'
+        );
 
         matchDiv.innerHTML =
           `${match.lineNumber}: ${highlightedLine}`;
