@@ -15,8 +15,8 @@ export function initShortcuts({ newFile, openFile }) {
 
     switch (e.key.toLowerCase()) {
 
-      // Ctrl+P — command palette
-      case 'p':
+      // Ctrl+F — command palette
+      case 'f':
         e.preventDefault();
         openPalette();
         break;
