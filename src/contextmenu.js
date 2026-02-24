@@ -11,6 +11,8 @@ const ctxNewFolder = document.getElementById('ctx-new-folder');
 const ctxRename    = document.getElementById('ctx-rename');
 const ctxCopyPath  = document.getElementById('ctx-copy-path');
 const ctxDelete    = document.getElementById('ctx-delete');
+const ctxMakeACopy   = document.getElementById('ctx-make-a-copy'); // @TODO for future
+
 
 export function initContextMenu(callbacks) {
   _callbacks = callbacks;
@@ -26,6 +28,7 @@ export function initContextMenu(callbacks) {
       showMenu(e, true, true); // isRoot = true
     }
   });
+
 
   ctxNewFile.addEventListener('mousedown', async () => {
     const base = ctxTarget || _callbacks.getCurrentVaultPath();
@@ -101,17 +104,32 @@ export function showContextMenu(e, path, isFolder) {
 }
 
 function showMenu(e, isFolder, isRoot) {
-  ctxNewFile.style.display   = isFolder ? '' : 'none';
-  ctxNewFolder.style.display = isFolder ? '' : 'none';
-  ctxRename.style.display    = isRoot   ? 'none' : '';
-  ctxCopyPath.style.display  = isFolder ? 'none' : '';
-  ctxDelete.style.display    = isRoot   ? 'none' : '';
 
-  const x = Math.min(e.clientX, window.innerWidth  - 180);
-  const y = Math.min(e.clientY, window.innerHeight - 160);
-  ctxMenu.style.left = x + 'px';
-  ctxMenu.style.top  = y + 'px';
-  ctxMenu.classList.add('open');
+    const items = [ctxNewFile, ctxNewFolder, ctxRename, ctxCopyPath, ctxDelete];
+    items.forEach(el => el.style.display = 'none');
+    document.querySelectorAll('.ctx-divider').forEach(div => div.style.display = 'none');
+
+    ctxNewFile.style.display   = isFolder ? '' : 'none';
+    ctxNewFolder.style.display = isFolder ? '' : 'none';
+    ctxRename.style.display    = isRoot   ? 'none' : '';
+    ctxCopyPath.style.display  = isFolder ? 'none' : '';
+    ctxDelete.style.display    = isRoot   ? 'none' : '';
+
+    document.querySelectorAll('.ctx-divider').forEach(div => {
+        let prev = div.previousElementSibling;
+        let next = div.nextElementSibling;
+
+        while(prev && prev.style.display === 'none') prev = prev.previousElementSibling;
+        while(next && next.style.display === 'none') next = next.nextElementSibling;
+
+        div.style.display = (prev && next) ? '' : 'none';
+    });
+
+    const x = Math.min(e.clientX, window.innerWidth - 180);
+    const y = Math.min(e.clientY, window.innerHeight - 160);
+    ctxMenu.style.left = x + 'px';
+    ctxMenu.style.top  = y + 'px';
+    ctxMenu.classList.add('open');
 }
 
 function hideContextMenu() { ctxMenu.classList.remove('open'); }

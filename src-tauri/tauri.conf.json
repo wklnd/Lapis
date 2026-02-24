@@ -19,9 +19,13 @@
         "minHeight": 400
       }
     ],
-    "security": {
-      "csp": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'"
+  "security": {
+    "csp": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'",
+    "assetProtocol": {
+      "enable": true,
+      "scope": ["**"]
     }
+}
   },
   "bundle": {
     "active": true,

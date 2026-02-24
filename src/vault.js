@@ -35,7 +35,7 @@ export async function loadVaultConfig(vaultPath) {
 }
 
 export async function saveVaultConfig(vaultPath, cfg) {
-  console.log('saveVaultConfig called with:', cfg); 
+  //console.log('saveVaultConfig called with:', cfg); 
   try {
     const d = vaultPath + '/.lapis';
     if (!(await exists(d))) await mkdir(d);

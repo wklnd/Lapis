@@ -1,8 +1,9 @@
-import { readTextFile, writeTextFile, exists } from '@tauri-apps/plugin-fs';
+import { readTextFile, readFile, writeTextFile, exists } from '@tauri-apps/plugin-fs';
 import { state, openVault, showWelcome, renderRecentVaultsList, handleCreateVault, handleOpenVaultDialog, saveVaultConfig, loadVaultConfig, loadGlobalConfig } from './vault.js';
 import { buildFileTree, allFiles} from './filetree.js';
 import { openFile as _openFile } from './editor.js';
 import { initContextMenu, showContextMenu } from './contextmenu.js';
+import { initEditorContextMenu, showEditorMenu } from './editor-contextmenu.js';
 import { showModal } from './modal.js';
 import { initSettings, openSettings, closeSettings, loadAndApplyTheme, setVaultPath } from './settings.js';
 import { initTabs, openTab, clearTabs, restoreTabs } from './tabs.js';
@@ -18,25 +19,14 @@ function renderVaultsList(vaults) {
     renderRecentVaultsList(vaults, handleOpenVault);
 }
 
-// ─── Open file ────────────────────────────────────────────────────────────────
-export async function handleOpenFile(filePath, itemEl) {
-    state.currentFilePath = filePath;
-    callbacks.currentFilePath = filePath;
-    await openTab(filePath);
-    await _openFile(filePath, itemEl, {
-        readTextFile,
-        recentFiles: state.recentFiles,
-        currentVaultPath: state.currentVaultPath,
-        saveVaultConfig,
-        loadVaultConfig
-    });
-}
-
 // ─── Shared callbacks ─────────────────────────────────────────────────────────
-const callbacks = {
+export const callbacks = {
     getCurrentVaultPath: () => state.currentVaultPath,
     getCurrentFilePath:  () => state.currentFilePath,
-    buildFileTree: (vaultPath) => buildFileTree(vaultPath, callbacks),
+    buildFileTree: async (vaultPath) => {
+        const cfg = await loadVaultConfig(vaultPath);
+        return buildFileTree(vaultPath, callbacks, cfg.showHidden || false);
+    },
     openFile: handleOpenFile,
     showContextMenu,
     currentFilePath: null,
@@ -48,16 +38,6 @@ const callbacks = {
         }
     },
 };
-
-// ─── New file ─────────────────────────────────────────────────────────────────
-async function newFile() {
-    const name = await showModal({ title: 'New File', placeholder: 'filename', confirmText: 'Create' });
-    if (!name) return;
-    const filePath = state.currentVaultPath + '/' + name + '.md';
-    await writeTextFile(filePath, '');
-    await callbacks.buildFileTree(state.currentVaultPath);
-    await handleOpenFile(filePath, null);
-}
 
 // ─── Open vault ───────────────────────────────────────────────────────────────
 export async function handleOpenVault(vaultPath) {
@@ -91,9 +71,11 @@ document.getElementById('btn-create').addEventListener('click', () =>
 
 // ─── Settings ─────────────────────────────────────────────────────────────────
 document.getElementById('btn-settings').addEventListener('click', openSettings);
-document.getElementById('settings-close').addEventListener('click', closeSettings);
 document.getElementById('settings-overlay').addEventListener('click', e => {
     if (e.target === document.getElementById('settings-overlay')) closeSettings();
+});
+document.addEventListener('lapis:rebuildTree', () => {
+    if (state.currentVaultPath) callbacks.buildFileTree(state.currentVaultPath);
 });
 
 // ─── Search ───────────────────────────────────────────────────────────────────
@@ -113,6 +95,7 @@ new GlobalSearch(readTextFile, handleOpenFile);
 
 // ─── Init ─────────────────────────────────────────────────────────────────────
 initContextMenu(callbacks);
+initEditorContextMenu({ getEditorView, showEditorMenu });
 initSettings({ getVaultPath: () => state.currentVaultPath, saveVaultConfig, loadVaultConfig });
 initTabs({
     openFile: handleOpenFile,
@@ -125,6 +108,8 @@ initCommands({ newFile, callbacks });
 initShortcuts({ newFile, openFile: handleOpenFile });
 initResize();
 initStatusBar();
+initImagePaste({ getVaultPath: () => state.currentVaultPath, getEditorView });
+initImageDrop({ getVaultPath: () => state.currentVaultPath, getEditorView });
 
 // ─── Boot ─────────────────────────────────────────────────────────────────────
 async function boot() {
@@ -136,5 +121,7 @@ async function boot() {
         if (await exists(last)) await handleOpenVault(last);
     }
 }
+
+
 
 boot();
