@@ -1,7 +1,7 @@
 import { readTextFile, readFile, writeTextFile, exists } from '@tauri-apps/plugin-fs';
 import { state, openVault, showWelcome, renderRecentVaultsList, handleCreateVault, handleOpenVaultDialog, saveVaultConfig, loadVaultConfig, loadGlobalConfig } from './vault.js';
 import { buildFileTree, allFiles} from './filetree.js';
-import { openFile as _openFile } from './editor.js';
+import { openFile as _openFile, getEditorView } from './editor.js';
 import { initContextMenu, showContextMenu } from './contextmenu.js';
 import { initEditorContextMenu, showEditorMenu } from './editor-contextmenu.js';
 import { showModal } from './modal.js';
@@ -13,6 +13,8 @@ import { initShortcuts } from './shortcuts.js';
 import { initResize } from './resize.js';
 import { initStatusBar } from './statusbar.js';
 import { GlobalSearch } from "./globalsearch.js";
+import { initImagePaste, initImageDrop, openImageViewer } from './images.js';
+import { handleOpenFile, newFile} from './filehandler.js';
 
 // ─── Vault list helper ────────────────────────────────────────────────────────
 function renderVaultsList(vaults) {
