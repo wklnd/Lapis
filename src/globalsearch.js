@@ -107,13 +107,17 @@ renderSingleFileResult(file, matches) {
 
   // --- Search all files for matching lines ---
   async searchVault(query, allFiles) {
-  const lowerQuery = query.toLowerCase();
-  const escapedQuery = this.escapeRegExp(query);
-  const regex = new RegExp(`(${escapedQuery})`, "gi");
+    const imageExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.bmp', '.webp', '.svg', '.ico', '.tiff'];
+    const lowerQuery = query.toLowerCase();
+    const escapedQuery = this.escapeRegExp(query);
+    const regex = new RegExp(`(${escapedQuery})`, "gi");
+    let foundAny = false;
 
-  let foundAny = false;
+    for (const file of allFiles) {
+        // Skip image files
+        const ext = file.path.slice(file.path.lastIndexOf('.')).toLowerCase();
+        if (imageExtensions.includes(ext)) continue;
 
-  for (const file of allFiles) {
     try {
       const content = await this.readTextFile(file.path);
       const lines = content.split("\n");

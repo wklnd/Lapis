@@ -1,13 +1,17 @@
 import { openPalette } from './palette.js';
 import { closeTab, getActiveTab, getAllTabs, setActiveTab, markClean } from './tabs.js';
 import { getEditorView } from './editor.js';
+import {GlobalSearch} from "./globalsearch.js";
+import { allFiles } from "./filetree";
 
 let _newFile   = null;
 let _openFile  = null;
+let _readTextFile = null;
 
-export function initShortcuts({ newFile, openFile }) {
+export function initShortcuts({ newFile, openFile, readTextFile }) {
   _newFile  = newFile;
   _openFile = openFile;
+
 
   document.addEventListener('keydown', async e => {
     const ctrl = e.ctrlKey || e.metaKey;
@@ -15,10 +19,18 @@ export function initShortcuts({ newFile, openFile }) {
 
     switch (e.key.toLowerCase()) {
 
-      // Ctrl+F — command palette
-      case 'f':
+      // Ctrl+P — command palette
+      case 'p':
         e.preventDefault();
         openPalette();
+        break;
+
+      // Ctrl+Shift+F — global search
+      case 'f':
+        if (!e.shiftKey) break;
+        e.preventDefault();
+        const globalSearch = new GlobalSearch(readTextFile, _openFile);
+        globalSearch.openGlobalSearch();
         break;
 
       // Ctrl+N — new file
