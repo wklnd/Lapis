@@ -171,17 +171,15 @@ class CodeBlockWidget extends WidgetType {
         wrap.appendChild(pre);
 
         wrap.addEventListener('mousedown', e => {
-        e.preventDefault();
-        // Find the editor view and move cursor to codeBlockFrom position
-        const view = EditorView.findFromDOM(wrap);
-        if (view) {
-            view.dispatch({
-                selection: { anchor: this.from },
-                scrollIntoView: true,
-            });
-            view.focus();
-        }
-    });
+            e.preventDefault();
+            const v = EditorView.findFromDOM(wrap);
+            if (v) {
+                // Place cursor on the opening fence line so cursorInRange fires
+                const pos = Math.min(this.from + 1, v.state.doc.length);
+                v.dispatch({ selection: { anchor: pos }, scrollIntoView: true });
+                v.focus();
+            }
+        });
 
         return wrap;
     }
@@ -189,7 +187,7 @@ class CodeBlockWidget extends WidgetType {
     ignoreEvent() { return false; }
 
     eq(other) {
-        return other.code === this.code && other.lang === this.lang && other.from === this.from;;
+        return other.code === this.code && other.lang === this.lang && other.from === this.from;
     }
     
 }
@@ -409,61 +407,48 @@ const markdownDecorations = ViewPlugin.fromClass(class {
             // ── Fenced code blocks ──
             if (text.trimStart().startsWith('```')) {
                 if (!inCodeBlock) {
-                    // OPENING FENCE
+                    // OPENING FENCE — start collecting
                     inCodeBlock   = true;
                     inCodeLang    = text.trimStart().slice(3).trim().toLowerCase();
                     codeBlockFrom = line.from;
                     codeLines     = [];
                     openFenceLine = i;
-
-                    if (!here) {
-                        decos.push({
-                            from: line.from,
-                            to: line.to,
-                            deco: Decoration.mark({
-                                attributes: { style: 'display:none;' }
-                            })
-                        });
-                    }
                 } else {
-                    // CLOSING FENCE
+                    // CLOSING FENCE — decide render vs edit mode
                     const codeBlockTo = line.to;
                     const cursorIn    = cursorInRange(view, codeBlockFrom, codeBlockTo);
                     inCodeBlock = false;
 
                     if (cursorIn) {
-                        // show raw markdown
+                        // Cursor inside: show all raw lines styled as monospace
                         for (let j = openFenceLine; j <= i; j++) {
                             const cl = doc.line(j);
                             decos.push({
                                 from: cl.from,
-                                to: cl.to,
+                                to:   cl.to,
                                 deco: Decoration.mark({
-                                    attributes: {
-                                        style: 'font-family:monospace;color:var(--text-muted);background:var(--bg-tertiary);display:block;padding:1px 12px;'
-                                    }
+                                    attributes: { style: 'font-family:monospace;color:var(--text-muted);background:var(--bg-tertiary);display:block;padding:1px 12px;border-radius:2px;' }
                                 })
                             });
                         }
                     } else {
+                        // Cursor outside: hide all raw lines and show widget
                         const code = codeLines.join('\n');
 
-                        // hide all lines including fences
                         for (let j = openFenceLine; j <= i; j++) {
                             const cl = doc.line(j);
                             decos.push({
                                 from: cl.from,
-                                to: cl.to,
+                                to:   cl.to,
                                 deco: Decoration.mark({
-                                    attributes: { style: 'display:none;' }
+                                    attributes: { style: 'display:none;font-size:0;' }
                                 })
                             });
                         }
 
-                        // insert rendered widget
                         decos.push({
                             from: codeBlockFrom,
-                            to: codeBlockFrom,
+                            to:   codeBlockFrom,
                             deco: Decoration.widget({
                                 widget: new CodeBlockWidget(code, inCodeLang, codeBlockFrom),
                                 side: -1,
@@ -474,16 +459,13 @@ const markdownDecorations = ViewPlugin.fromClass(class {
                     inCodeLang = '';
                     codeLines  = [];
                 }
-
                 continue;
             }
 
             if (inCodeBlock) {
                 codeLines.push(text);
-                if (!here) {
-                    decos.push({ from: line.from, to: line.to,
-                        deco: Decoration.mark({ attributes: { style: 'display:none;' } }) });
-                }
+                // Never individually hide code body lines here —
+                // they are handled in bulk when the closing fence is found
                 continue;
             }
 
