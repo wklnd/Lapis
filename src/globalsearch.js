@@ -1,5 +1,8 @@
 // ─── Global Search Class ───────────────────────────────────────────────────────────────
 import { allFiles } from "./filetree";
+import { getEditorView } from "./editor.js";
+import { EditorSelection } from "@codemirror/state";
+import { EditorView } from "@codemirror/view";
 
 export class GlobalSearch {
   constructor(readTextFile, handleOpenFile) {
@@ -35,8 +38,6 @@ export class GlobalSearch {
     // --- Real-time search input ---
     this.searchInput.addEventListener("input", async (e) => {
       const query = e.target.value.trim();
-      alert("Input event fired! Query: " + query);
-
       if (!query) {
         this.searchResults.innerHTML =
           "<div style='padding:10px;color:#888'>No search query</div>";
@@ -82,28 +83,65 @@ renderSingleFileResult(file, matches) {
   const fileDiv = document.createElement("div");
   fileDiv.classList.add("search-file");
   fileDiv.dataset.path = file.path;
-  fileDiv.style.cursor = "pointer";
-
-  fileDiv.addEventListener("click", () => {
-    this.openFile(file.path, null);
-    this.closeGlobalSearch();
-  });
 
   fileDiv.innerHTML = `
     <div>${file.name}</div>
-    <div style="font-size:12px;color:#888;">${file.path}</div>
+    <div style="font-size:12px;color:var(--text-muted);">${file.path}</div>
   `;
 
   matches.forEach(match => {
     const matchDiv = document.createElement("div");
-    matchDiv.style.paddingLeft = "10px";
-    matchDiv.style.fontSize = "14px";
-    matchDiv.innerHTML = `${match.lineNumber}: ${match.text}`;
+    matchDiv.style.cssText = "padding:3px 10px 3px 16px;font-size:13px;cursor:pointer;border-radius:4px;";
+    matchDiv.innerHTML = `<span style="color:var(--text-muted);margin-right:8px;font-size:11px;font-variant-numeric:tabular-nums;">${match.lineNumber}</span>${match.text}`;
+
+    matchDiv.addEventListener("mouseenter", () => { matchDiv.style.background = "var(--bg-tertiary)"; });
+    matchDiv.addEventListener("mouseleave", () => { matchDiv.style.background = ""; });
+
+    matchDiv.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      await this.openFile(file.path, null);
+      this.closeGlobalSearch();
+      setTimeout(() => this.jumpToMatch(match.lineNumber, match.rawText), 100);
+    });
+
     fileDiv.appendChild(matchDiv);
+  });
+
+  // Clicking the file header opens at line 1
+  fileDiv.querySelector("div").addEventListener("click", async () => {
+    await this.openFile(file.path, null);
+    this.closeGlobalSearch();
   });
 
   this.searchResults.appendChild(fileDiv);
 }
+
+jumpToMatch(lineNumber, rawText) {
+  const view = getEditorView();
+  if (!view) return;
+  const doc = view.state.doc;
+  if (lineNumber > doc.lines) return;
+
+  const line = doc.line(lineNumber);
+
+  // Find exact match position for selection
+  let from = line.from;
+  let to   = line.to;
+  if (rawText) {
+    const idx = line.text.indexOf(rawText.trim());
+    if (idx !== -1) {
+      from = line.from + idx;
+      to   = line.from + idx + rawText.trim().length;
+    }
+  }
+
+  view.dispatch({
+    selection: EditorSelection.range(from, to),
+    effects: EditorView.scrollIntoView(from, { y: "center" }),
+  });
+  view.focus();
+}
+
 
   // --- Search all files for matching lines ---
   async searchVault(query, allFiles) {
@@ -123,6 +161,7 @@ renderSingleFileResult(file, matches) {
         if (line.toLowerCase().includes(lowerQuery)) {
           matches.push({
             lineNumber: i + 1,
+            rawText: line,
             text: line.replace(regex, '<span class="highlight">$1</span>')
           });
         }

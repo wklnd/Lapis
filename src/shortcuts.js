@@ -30,7 +30,7 @@ export function initShortcuts({ newFile, openFile, readTextFile }) {
         if (!e.shiftKey) break;
         e.preventDefault();
         const globalSearch = new GlobalSearch(readTextFile, _openFile);
-        globalSearch.openGlobalSearch();
+        globalSearch.open();
         break;
 
       // Ctrl+N — new file

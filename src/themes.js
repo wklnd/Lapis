@@ -136,6 +136,21 @@ export const BUILT_IN_THEMES = {
     'border':        '#d6d9df',
     'sidebar-bg':    '#eceef2',
   }
+},
+'helios': {
+  name: 'Helios',
+  built_in: false,
+  colors: {
+    'bg-primary':    '#fdf6e3', 
+    'bg-secondary':  '#f6e8c9',  
+    'bg-tertiary':   '#edd9a3', 
+    'bg-editor':     '#fffdf7',  
+    'text-primary':  '#3a2f1f', 
+    'text-muted':    '#8b7355',
+    'accent':        '#e6a817',  
+    'border':        '#e2c98a', 
+    'sidebar-bg':    '#f6e8c9',
+  }
 }
 };
 

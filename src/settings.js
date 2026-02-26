@@ -46,24 +46,24 @@ export function closeSettings() {
 async function renderSettings() {
     const overlay = document.getElementById('settings-overlay');
 
-    // Build the full panel if it doesn't exist yet
+    // Build the full panel and wire listeners ONCE
     if (!overlay.querySelector('.sp-layout')) {
         overlay.innerHTML = buildShell();
         overlay.querySelector('.sp-close').addEventListener('click', closeSettings);
         overlay.addEventListener('click', e => { if (e.target === overlay) closeSettings(); });
+
+        // Wire nav here — inside the if block so it only runs once
+        overlay.querySelectorAll('.sp-nav-item').forEach(item => {
+            item.addEventListener('click', () => {
+                activeTab = item.dataset.tab;
+                overlay.querySelectorAll('.sp-nav-item').forEach(i => i.classList.remove('active'));
+                item.classList.add('active');
+                renderTab(activeTab);
+            });
+        });
     }
 
-    // Wire up nav
-    overlay.querySelectorAll('.sp-nav-item').forEach(item => {
-        item.addEventListener('click', () => {
-            activeTab = item.dataset.tab;
-            overlay.querySelectorAll('.sp-nav-item').forEach(i => i.classList.remove('active'));
-            item.classList.add('active');
-            renderTab(activeTab);
-        });
-    });
-
-    // Set active nav item
+    // Just update the active highlight and render the current tab
     overlay.querySelectorAll('.sp-nav-item').forEach(i => {
         i.classList.toggle('active', i.dataset.tab === activeTab);
     });
@@ -195,12 +195,12 @@ function renderGeneral(content) {
     const infoEl = document.createElement('div');
     infoEl.className = 'sp-about';
     infoEl.innerHTML = `
-        <div class="sp-about-logo">LogoHere</div>
-        <div class="sp-about-name">Lapis</div>
-        <div class="sp-about-version">Version 0.1.0</div>
+        <div class="sp-about-logo">⬡</div>
+        <div class="sp-about-name">Lapis - Helios Edition</div>
+        <div class="sp-about-version">Version 1</div>
         <div class="sp-about-desc">A minimal markdown editor with vault support.</div>
         <div class="sp-about-links">
-            <span class="sp-about-tag">Built with Tauri + CodeMirror</span>
+            <span class="sp-about-tag">LapisLabs ⬡</span>
         </div>
     `;
     about.appendChild(infoEl);
@@ -430,6 +430,8 @@ function renderHotkeys(content) {
         { label: 'Switch Tab Left',   keys: ['Ctrl', 'Shift', 'Tab'] },
         { label: 'Switch Tab Right',  keys: ['Ctrl', 'Tab']     },
         { label: 'Open Settings',     keys: ['Ctrl', ',']       },
+        { label: 'Global Search',     keys: ['Ctrl', 'Shift', 'F'] },
+        { label: 'File Search',       keys: ['Ctrl', 'F'] },
         { label: 'Toggle Hidden Files', keys: ['—']             },
     ];
 
