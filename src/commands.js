@@ -21,7 +21,8 @@ export function initCommands({ newFile, callbacks }) {
         const showHidden = !cfg.showHidden;
         await saveVaultConfig(vaultPath, { ...cfg, showHidden });
         await callbacks.buildFileTree(vaultPath, showHidden);
-      }
-    },
+      }},
+    {label: 'Reload Lapis', shortcut: 'Ctrl+R', action: () => location.reload() },
+    
   ]);
 }
