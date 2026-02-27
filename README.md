@@ -57,6 +57,16 @@ Output lands in `src-tauri/target/release/bundle/`.
 
 ---
 
+## Screenshots
+
+<p align="center">
+  <img src="media/editor.png" alt="Editor screenshot" width="800">
+</p>
+
+<p align="center">
+  <img src="media/settings.png" alt="Settings screenshot" width="600">
+</p>
+
 ## Custom themes
 
 Drop a `.json` file into `.lapis/themes/` inside your vault:
