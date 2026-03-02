@@ -102,4 +102,4 @@ Or create one from Settings inside the app.
 
 ## License
 
-MIT
+Source-available — see LICENSE.md for details.
