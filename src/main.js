@@ -124,6 +124,22 @@ async function boot() {
     }
 }
 
+function hideReloadScreen() {
+    const el = document.getElementById('reload-screen');
+    if (!el) return;
+    el.style.transition = 'opacity 180ms ease';
+    el.style.opacity = '0';
+    setTimeout(() => el.remove(), 220);
+}
 
+async function start() {
+    try {
+        await boot();
+    } catch (e) {
+        console.error('Boot error', e);
+    } finally {
+        hideReloadScreen();
+    }
+}
 
-boot();
+start();

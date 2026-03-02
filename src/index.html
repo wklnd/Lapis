@@ -3,9 +3,29 @@
 <head>
   <meta charset="UTF-8" />
   <title>Lapis</title>
+  <script>
+    try {
+      const c = JSON.parse(localStorage.getItem('lapis-last-theme'));
+      if (c) {
+        const r = document.documentElement;
+        for (const [k, v] of Object.entries(c))
+          r.style.setProperty('--' + k, v);
+      }
+    } catch(e) {}
+  </script>
   <link rel="stylesheet" href="./assets/style.css">
 </head>
 <body>
+
+<!-- RELOAD SPLASH -->
+<div id="reload-screen">
+  <div class="reload-inner">
+    <div class="reload-card">
+      <div class="logo"><span class="logo-icon">⬡</span> Lapis</div>
+      <div class="reload-text">Reloading<span class="dots"><span>.</span><span>.</span><span>.</span></span></div>
+    </div>
+  </div>
+</div>
 
 <!-- WELCOME SCREEN -->
 <div id="welcome">

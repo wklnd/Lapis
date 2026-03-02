@@ -159,6 +159,7 @@ export function applyTheme(colors) {
   for (const [key, value] of Object.entries(colors)) {
     root.style.setProperty('--' + key, value);
   }
+  localStorage.setItem('lapis-last-theme', JSON.stringify(colors));
 }
 
 export async function loadCustomThemes(vaultPath) {
