@@ -258,6 +258,15 @@ async function renderEditor(content, cfg) {
         })
     ));
 
+    // Reading speed (WPM)
+    const savedWpm = parseInt(localStorage.getItem('lapis-wpm') || '200');
+    sec.appendChild(row('Reading Speed', 'Words per minute used for the reading time estimate',
+        makeSlider({
+            min: 50, max: 600, step: 10, value: savedWpm, unit: ' wpm',
+            onInput: val => localStorage.setItem('lapis-wpm', val)
+        })
+    ));
+
     // Word wrap
     const wrapEnabled = cfg.wordWrap !== false;
     sec.appendChild(row('Word Wrap', 'Wrap long lines in the editor',

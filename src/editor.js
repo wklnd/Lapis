@@ -3,6 +3,7 @@ import { keymap, highlightActiveLine, ViewPlugin, Decoration, WidgetType } from 
 import { defaultKeymap, historyKeymap, history } from '@codemirror/commands';
 import { bracketMatching } from '@codemirror/language';
 import { closeBrackets } from '@codemirror/autocomplete';
+import { macroExpansionExtension } from './macros.js';
 import { RangeSetBuilder } from '@codemirror/state';
 import { markdown } from '@codemirror/lang-markdown';
 import { HighlightStyle, syntaxHighlighting } from '@codemirror/language';
@@ -628,6 +629,7 @@ function buildExtensions(filePath) {
         buildEditorTheme(),
         buildHighlightStyle(),
         markdownDecorations,
+        macroExpansionExtension,
         EditorView.lineWrapping,
         EditorView.updateListener.of(update => {
             if (update.docChanged) {

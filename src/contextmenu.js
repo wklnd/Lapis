@@ -32,12 +32,8 @@ export function initContextMenu(callbacks) {
 
   ctxNewFile.addEventListener('mousedown', async () => {
     const base = ctxTarget || _callbacks.getCurrentVaultPath();
-    const name = await showModal({ title: 'New File', placeholder: 'filename', confirmText: 'Create' });
-    if (!name) return;
-    const filePath = base + '/' + name + '.md';
-    await writeTextFile(filePath, '');
-    await _callbacks.buildFileTree(_callbacks.getCurrentVaultPath());
-    await _callbacks.openFile(filePath, null);
+    hideContextMenu();
+    await _callbacks.newFileIn(base);
   });
 
     ctxNewFolder.addEventListener('mousedown', async () => {

@@ -79,7 +79,14 @@
   <div id="modal-box">
     <h2 id="modal-title"></h2>
     <p id="modal-desc" style="display:none"></p>
-    <input id="modal-input" style="display:none" />
+    <div id="modal-field-name" style="display:none">
+      <label id="modal-input-label" class="modal-field-label"></label>
+      <input id="modal-input" />
+    </div>
+    <div id="modal-field-select" style="display:none">
+      <label id="modal-select-label" class="modal-field-label"></label>
+      <select id="modal-select"></select>
+    </div>
     <div id="modal-actions">
       <button id="modal-cancel">Cancel</button>
       <button id="modal-confirm">Confirm</button>

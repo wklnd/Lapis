@@ -14,7 +14,7 @@ import { initResize } from './resize.js';
 import { initStatusBar } from './statusbar.js';
 import { GlobalSearch } from "./globalsearch.js";
 import { initImagePaste, initImageDrop, openImageViewer } from './images.js';
-import { handleOpenFile, newFile} from './filehandler.js';
+import { handleOpenFile, newFile, newFileIn } from './filehandler.js';
 
 // ─── Vault list helper ────────────────────────────────────────────────────────
 function renderVaultsList(vaults) {
@@ -96,7 +96,7 @@ document.getElementById('search-box').addEventListener('input', e => {
 new GlobalSearch(readTextFile, handleOpenFile);
 
 // ─── Init ─────────────────────────────────────────────────────────────────────
-initContextMenu(callbacks);
+initContextMenu({ ...callbacks, newFileIn });
 initEditorContextMenu({ getEditorView, showEditorMenu });
 initSettings({ getVaultPath: () => state.currentVaultPath, saveVaultConfig, loadVaultConfig });
 initTabs({

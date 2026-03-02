@@ -61,6 +61,7 @@ html, body {
   height: 44px;
   border-radius: 8px;
   background: transparent;
+  filter: drop-shadow(0 0 6px var(--accent));
   font-weight: 700;
   flex-shrink: 0;
   transform-origin: 50% 50%;
@@ -518,7 +519,8 @@ html, body {
 #modal-box h2 { color: var(--text-primary); font-size: 1.1em; }
 #modal-box p  { color: var(--text-muted);   font-size: 0.9em; }
 
-#modal-input {
+#modal-input,
+#modal-select {
   padding: 9px 12px;
   background: var(--bg-primary);
   border: 1px solid var(--border);
@@ -528,7 +530,13 @@ html, body {
   outline: none;
   width: 100%;
 }
-#modal-input:focus { border-color: var(--accent); }
+#modal-input:focus,
+#modal-select:focus { border-color: var(--accent); }
+#modal-select { cursor: pointer; appearance: none; background-image: none; }
+#modal-select option { background: var(--bg-secondary); color: var(--text-primary); }
+#modal-field-name,
+#modal-field-select { display: flex; flex-direction: column; gap: 5px; }
+.modal-field-label  { font-size: 0.8em; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
 
 #modal-actions { display: flex; gap: 8px; justify-content: flex-end; margin-top: 4px; }
 #modal-actions button { padding: 8px 20px; border-radius: 6px; border: none; cursor: pointer; font-size: 0.9em; }
@@ -563,10 +571,28 @@ html, body {
 .ctx-item.danger      { color: #f87171; }
 .ctx-item.danger:hover { background: rgba(248,113,113,0.1); }
 .ctx-divider          { height: 1px; background: var(--border); margin: 4px 0; }
+.ctx-label            { padding: 4px 12px 2px; font-size: 0.75em; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; user-select: none; }
+.ctx-chevron          { margin-left: auto; opacity: 0.5; font-size: 1.1em; line-height: 1; }
 
-/* ══════════════════════════════════════════════════════════════
-   SETTINGS PANEL
-══════════════════════════════════════════════════════════════ */
+/* Editor context menu & insert submenu */
+#editor-context-menu,
+#editor-insert-submenu {
+  position: fixed;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px;
+  z-index: 2000;
+  min-width: 180px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  display: none;
+}
+
+#editor-context-menu .ctx-item.active {
+  background: var(--bg-tertiary);
+}
+
+/* ── Settings menu ─────────────────────────────────────────────── */
 
 #settings-overlay {
     display: none;

@@ -91,6 +91,30 @@ Drop a `.json` file into `.lapis/themes/` inside your vault:
 Or create one from Settings inside the app.
 
 ---
+### Macros
+
+Type any macro in the editor and it expands automatically when the closing `}}` is completed.
+
+| Macro | Example output | Description |
+|---|---|---|
+| `{{DATE}}` | `2026-03-03` | Today's date in ISO format |
+| `{{DATE_SHORT}}` | `03/03/2026` | Date as DD/MM/YYYY |
+| `{{DATE_LONG}}` | `Monday, March 3 2026` | Full human-readable date |
+| `{{TIME}}` | `14:22` | Current time (HH:MM) |
+| `{{TIME_FULL}}` | `14:22:09` | Current time with seconds |
+| `{{DATETIME}}` | `2026-03-03 14:22` | Date and time combined |
+| `{{TIMESTAMP}}` | `1741006920` | Unix timestamp in seconds |
+| `{{WEEKDAY}}` | `Monday` | Full name of the current day |
+| `{{WEEKDAY_SHORT}}` | `Mon` | Abbreviated day name |
+| `{{WEEK}}` | `10` | ISO week number of the year |
+| `{{MONTH}}` | `March` | Full name of the current month |
+| `{{MONTH_SHORT}}` | `Mar` | Abbreviated month name |
+| `{{MONTH_NUM}}` | `03` | Month as a zero-padded number |
+| `{{YEAR}}` | `2026` | Current four-digit year |
+| `{{YEAR_SHORT}}` | `26` | Current two-digit year |
+| `{{DAY}}` | `03` | Day of the month, zero-padded |
+| `{{UUID}}` | `a1b2c3d4-...` | Random UUID v4 |
+| `{{RANDOM}}` | `4271` | Random integer between 0 and 9999 |
 
 ## Stack
 

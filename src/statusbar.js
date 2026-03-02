@@ -13,10 +13,13 @@ export function updateStatus(filePath, words, chars) {
   const name = filePath
     ? filePath.replace(/\\/g, '/').split('/').pop()
     : '';
-    
+
+  const readMins = words > 0 ? Math.max(1, Math.round(words / (parseInt(localStorage.getItem('lapis-wpm') || '200')))) : 0;
+  const readTime = readMins > 0 ? `${readMins} min read` : '';
+
   left.textContent  = name;
   right.innerHTML   = filePath
-    ? `<span>${words} words</span><span>${chars} chars</span>`
+    ? `<span>${words} words</span><span>${chars} chars</span>${readTime ? `<span>${readTime}</span>` : ''}`
     : '';
 }
 
