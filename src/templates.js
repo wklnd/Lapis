@@ -60,6 +60,62 @@ export const BUILT_IN_TEMPLATES = [
 ## Notes
 `,
     },
+    {
+        label: 'Screenplay',
+        content: `# Title
+### Written by
+
+---
+
+## ACT ONE
+
+**FADE IN:**
+
+**INT. LOCATION — DAY**
+
+*Description of the scene. Set the tone, establish the space.*
+
+**CHARACTER NAME**
+Dialogue goes here.
+
+**ANOTHER CHARACTER**
+Response dialogue here.
+
+*Action line. What we see happening.*
+
+**CUT TO:**
+
+---
+
+## ACT TWO
+
+**INT. LOCATION — NIGHT**
+
+*Description.*
+
+**CHARACTER NAME**
+Dialogue.
+
+**CUT TO:**
+
+---
+
+## ACT THREE
+
+**INT. LOCATION — DAY**
+
+*Description.*
+
+**CHARACTER NAME**
+Final dialogue.
+
+**FADE OUT.**
+
+---
+
+*THE END*
+`,
+    },
 ];
 
 // ─── Macro expansion ──────────────────────────────────────────────────────────

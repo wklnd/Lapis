@@ -2,6 +2,8 @@
 
 [] Clean up css
 
+[] Update / Rework filetree.js to be more efficient and less buggy
+
 [x] Change Theme so Light is the standard
 
 [] Fix dirty / clean state of tabs
