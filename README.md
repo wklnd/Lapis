@@ -3,13 +3,7 @@
 </p>
 
 
-A minimal markdown editor built with Tauri. Fast to open, stays out of your way.
----
-
-## Why
-
-Most markdown editors are either too heavy (Obsidian, Notion) or too bare-bones. Lapis goal is to sit in the middle, it renders markdown as you type, keeps your files as plain `.md` files on disk, and ships as a ~10MB binary.
-
+A minimal markdown editor built with Tauri. Just Enough to do bare minimum. 
 ---
 
 ## Features
